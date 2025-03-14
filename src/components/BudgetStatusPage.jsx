@@ -1,5 +1,4 @@
 import React from 'react';
-import VisitScheduler from './VisitScheduler'; 
 import BudgetList from './BudgetList';
 import { supabase } from '../supabase/client';
 
@@ -109,9 +108,6 @@ function BudgetStatusPage({ budgets, setBudgets, validadeOrcamento }) {
 
   return (
     <div>
-      <h2>Agendamentos e Visitas para Orçamento</h2>
-      <VisitScheduler /> {/* Render VisitScheduler component here */}
-      <br/>
       <h2>Orçamentos Existentes</h2>
       <BudgetList
         budgets={budgets}
