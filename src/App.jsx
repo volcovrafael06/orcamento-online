@@ -19,6 +19,8 @@ import { authService } from './services/authService';
 import { syncService } from './services/syncService';
 import { localDB } from './services/localDatabase';
 import VisitScheduler from './components/VisitScheduler';
+import ConnectionStatus from './components/ConnectionStatus';
+import './components/ConnectionStatus.css';
 
 function App() {
   const [companyLogo, setCompanyLogo] = useState(null);
@@ -158,6 +160,7 @@ function App() {
   };
 
   const handleLogin = (user) => {
+    console.log('Login successful:', user);
     setLoggedInUser(user);
     navigate("/");
   };
@@ -290,240 +293,194 @@ function App() {
     );
   }
 
+  // If no user is logged in, show only the login page
+  if (!loggedInUser) {
+    return (
+      <div className="app">
+        <div className="login-page-container">
+          <Login onLogin={handleLogin} />
+        </div>
+        <footer className="app-footer">
+          <p>© 2025 Vecchio Sistemas</p>
+        </footer>
+      </div>
+    );
+  }
+
+  // If user is logged in, show the main application
   return (
     <div className="app">
-      {loggedInUser && (
-        <>
-          <button 
-            className="menu-toggle" 
-            onClick={toggleSidebar}
-            aria-label="Toggle Menu"
-          >
-            {sidebarExpanded ? '✕' : '☰'}
-          </button>
-          
-          {companyLogo && (
-            <img 
-              src={companyLogo} 
-              alt="Logo da Empresa" 
-              className="company-logo"
-            />
-          )}
-
-          <div className={`sidebar ${sidebarExpanded ? 'expanded' : ''}`}>
-            <nav>
-              <ul className="nav-list">
-                <li className="nav-item">
-                  <NavLink to="/" className="nav-link">
-                    <span className="icon">🏠</span>
-                    <span className="text">Home</span>
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to="/customers" className="nav-link">
-                    <span className="icon">👥</span>
-                    <span className="text">Clientes</span>
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to="/products" className="nav-link">
-                    <span className="icon">📦</span>
-                    <span className="text">Produtos</span>
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to="/accessories" className="nav-link">
-                    <span className="icon">🔧</span>
-                    <span className="text">Acessórios</span>
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to="/budgets" className="nav-link">
-                    <span className="icon">📝</span>
-                    <span className="text">Orçamentos</span>
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to="/reports" className="nav-link">
-                    <span className="icon">📊</span>
-                    <span className="text">Relatórios</span>
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to="/visits" className="nav-link">
-                    <span className="icon">📅</span>
-                    <span className="text">Visitas</span>
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to="/configuracoes" className="nav-link">
-                    <span className="icon">⚙️</span>
-                    <span className="text">Configurações</span>
-                  </NavLink>
-                </li>
-              </ul>
-            </nav>
-          </div>
-          <main className={`main-content ${sidebarExpanded ? 'expanded' : ''}`}>
-            <Routes>
-              <Route 
-                path="/" 
-                element={
-                  loggedInUser ? (
-                    <HomePage 
-                      budgets={budgets} 
-                      customers={customers} 
-                      setCustomers={setCustomers} 
-                      products={products} 
-                      setProducts={setProducts} 
-                      accessories={accessories} 
-                      setAccessories={setAccessories} 
-                      visits={visits} 
-                      setVisits={setVisits}
-                      setCompanyLogo={setCompanyLogo}
-                      companyLogo={companyLogo}
-                    />
-                  ) : (
-                    <Login onLogin={handleLogin} />
-                  )
-                } 
-              />
-              <Route path="/login" element={<Login onLogin={handleLogin} />} />
-              <Route 
-                path="/customers" 
-                element={
-                  authService.hasAccess('admin') ? (
-                    <Customers 
-                      customers={customers} 
-                      setCustomers={setCustomers} 
-                    />
-                  ) : (
-                    <div>Acesso negado.</div>
-                  )
-                } 
-              />
-              <Route 
-                path="/products" 
-                element={
-                  authService.hasAccess('admin') ? (
-                    <Products 
-                      products={products} 
-                      setProducts={setProducts} 
-                    />
-                  ) : (
-                    <div>Acesso negado.</div>
-                  )
-                } 
-              />
-              <Route 
-                path="/accessories" 
-                element={
-                  authService.hasAccess('admin') ? (
-                    <Accessories 
-                      accessories={accessories} 
-                      setAccessories={setAccessories} 
-                    />
-                  ) : (
-                    <div>Acesso negado.</div>
-                  )
-                } 
-              />
-              <Route 
-                path="/budgets" 
-                element={
-                  <BudgetList 
-                    budgets={budgets}
-                    validadeOrcamento={validadeOrcamento}
-                    onFinalizeBudget={handleFinalizeBudget}
-                    onCancelBudget={handleCancelBudget}
-                    onReactivateBudget={handleReactivateBudget}
-                  />
-                } 
-              />
-              <Route 
-                path="/budgets/new" 
-                element={
-                  <Budgets 
-                    budgets={budgets}
-                    setBudgets={setBudgets}
-                    customers={customers}
-                    setCustomers={setCustomers}
-                    products={products}
-                    setProducts={setProducts}
-                    accessories={accessories}
-                    setAccessories={setAccessories}
-                  />
-                } 
-              />
-              <Route 
-                path="/budgets/:budgetId/view" 
-                element={
-                  <BudgetDetailsPage 
-                    budgets={budgets}
-                    companyLogo={companyLogo}
-                  />
-                } 
-              />
-              <Route 
-                path="/budgets/:budgetId/edit" 
-                element={
-                  <Budgets 
-                    budgets={budgets}
-                    setBudgets={setBudgets}
-                    customers={customers}
-                    setCustomers={setCustomers}
-                    products={products}
-                    setProducts={setProducts}
-                    accessories={accessories}
-                    setAccessories={setAccessories}
-                  />
-                } 
-              />
-              <Route 
-                path="/reports" 
-                element={
-                  authService.hasAccess('admin') ? (
-                    <Reports budgets={budgets} />
-                  ) : (
-                    <div>Acesso negado.</div>
-                  )
-                } 
-              />
-              <Route 
-                path="/configuracoes" 
-                element={
-                  authService.hasAccess('admin') ? (
-                    <Configuracoes 
-                      setCompanyLogo={setCompanyLogo} 
-                      setValidadeOrcamento={setValidadeOrcamento} 
-                      validadeOrcamento={validadeOrcamento} 
-                    />
-                  ) : (
-                    <div>Acesso negado.</div>
-                  )
-                } 
-              />
-              <Route 
-                path="/visits" 
-                element={
-                  authService.hasAccess('admin') ? (
-                    <VisitScheduler 
-                      visits={visits} 
-                      setVisits={setVisits}
-                    />
-                  ) : (
-                    <div>Acesso negado.</div>
-                  )
-                } 
-              />
-              <Route path="/test-db" element={<TestDB />} />
-            </Routes>
-          </main>
-        </>
+      <button 
+        className="menu-toggle" 
+        onClick={toggleSidebar}
+        aria-label="Toggle Menu"
+      >
+        {sidebarExpanded ? '✕' : '☰'}
+      </button>
+      
+      {companyLogo && (
+        <img 
+          src={companyLogo} 
+          alt="Logo da Empresa" 
+          className="company-logo"
+        />
       )}
 
+      <div className={`sidebar ${sidebarExpanded ? 'expanded' : ''}`}>
+        <nav>
+          <ul className="nav-list">
+            <li className="nav-item">
+              <NavLink to="/" className="nav-link">
+                <span className="icon">🏠</span>
+                <span className="text">Home</span>
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/customers" className="nav-link">
+                <span className="icon">👥</span>
+                <span className="text">Clientes</span>
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/products" className="nav-link">
+                <span className="icon">📦</span>
+                <span className="text">Produtos</span>
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/accessories" className="nav-link">
+                <span className="icon">🔧</span>
+                <span className="text">Acessórios</span>
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/budgets" className="nav-link">
+                <span className="icon">📝</span>
+                <span className="text">Orçamentos</span>
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/reports" className="nav-link">
+                <span className="icon">📊</span>
+                <span className="text">Relatórios</span>
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/visits" className="nav-link">
+                <span className="icon">📅</span>
+                <span className="text">Visitas</span>
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/configuracoes" className="nav-link">
+                <span className="icon">⚙️</span>
+                <span className="text">Configurações</span>
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <button onClick={handleLogout} className="nav-link logout-button">
+                <span className="icon">🚪</span>
+                <span className="text">Sair</span>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <main className={`main-content ${sidebarExpanded ? 'expanded' : ''}`}>
+        <ConnectionStatus />
+        <Routes>
+          <Route 
+            path="/" 
+            element={<HomePage 
+              budgets={budgets} 
+              customers={customers} 
+              visits={visits} 
+              setVisits={setVisits}
+            />}
+          />
+          <Route 
+            path="/customers" 
+            element={
+              authService.hasAccess('admin') ? (
+                <Customers 
+                  customers={customers} 
+                  setCustomers={setCustomers}
+                />
+              ) : (
+                <div>Acesso restrito</div>
+              )
+            }
+          />
+          <Route 
+            path="/products" 
+            element={<Products products={products} setProducts={setProducts} />}
+          />
+          <Route 
+            path="/accessories" 
+            element={<Accessories accessories={accessories} setAccessories={setAccessories} />}
+          />
+          <Route 
+            path="/budgets" 
+            element={<BudgetStatusPage budgets={budgets} setBudgets={setBudgets} validadeOrcamento={validadeOrcamento} />}
+          />
+          <Route 
+            path="/budgets/new" 
+            element={<Budgets 
+              budgets={budgets} 
+              setBudgets={setBudgets} 
+              customers={customers} 
+              products={products} 
+              accessories={accessories} 
+              setCustomers={setCustomers} 
+            />}
+          />
+          <Route 
+            path="/budgets/:budgetId/edit" 
+            element={<Budgets 
+              budgets={budgets} 
+              setBudgets={setBudgets} 
+              customers={customers} 
+              products={products} 
+              accessories={accessories} 
+              setCustomers={setCustomers} 
+            />}
+          />
+          <Route 
+            path="/budgets/:budgetId/view" 
+            element={<BudgetDetailsPage companyLogo={companyLogo} />}
+          />
+          <Route 
+            path="/reports" 
+            element={<Reports budgets={budgets} customers={customers} />}
+          />
+          <Route 
+            path="/visits" 
+            element={<VisitScheduler visits={visits} setVisits={setVisits} />}
+          />
+          <Route 
+            path="/configuracoes" 
+            element={
+              authService.hasAccess('admin') ? (
+                <Configuracoes 
+                  setCompanyLogo={setCompanyLogo} 
+                  companyLogo={companyLogo} 
+                  validadeOrcamento={validadeOrcamento} 
+                  setValidadeOrcamento={setValidadeOrcamento} 
+                />
+              ) : (
+                <div>Acesso restrito</div>
+              )
+            }
+          />
+          <Route 
+            path="/test" 
+            element={<TestDB />}
+          />
+        </Routes>
+      </main>
+      
       <footer className="app-footer">
-        <p> 2025 Vecchio Sistemas</p>
+        <p>© 2025 Vecchio Sistemas</p>
       </footer>
     </div>
   );
