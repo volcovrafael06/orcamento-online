@@ -387,7 +387,6 @@ function App() {
         </nav>
       </div>
       <main className={`main-content ${sidebarExpanded ? 'expanded' : ''}`}>
-        <ConnectionStatus />
         <Routes>
           <Route 
             path="/" 
@@ -480,7 +479,7 @@ function App() {
       </main>
       
       <footer className="app-footer">
-        <p>© 2025 Vecchio Sistemas</p>
+        <p>© 2025 Vecchio Sistemas <ConnectionStatus /></p>
       </footer>
     </div>
   );
