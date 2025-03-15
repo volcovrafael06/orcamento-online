@@ -20,6 +20,7 @@ function VisitScheduler() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [filter, setFilter] = useState('all');
 
   useEffect(() => {
     fetchVisits();
@@ -260,6 +261,26 @@ function VisitScheduler() {
 
       <div className="visit-list-header">
         <h3>Visitas Agendadas</h3>
+        <div className="visit-filter-buttons">
+          <button 
+            className={`filter-button ${filter === 'all' ? 'active' : ''}`}
+            onClick={() => setFilter('all')}
+          >
+            Todas
+          </button>
+          <button 
+            className={`filter-button ${filter === 'confirmed' ? 'active' : ''}`}
+            onClick={() => setFilter('confirmed')}
+          >
+            Confirmadas
+          </button>
+          <button 
+            className={`filter-button ${filter === 'pending' ? 'active' : ''}`}
+            onClick={() => setFilter('pending')}
+          >
+            Pendentes
+          </button>
+        </div>
         <button className="btn btn-primary" onClick={() => setShowModal(true)}>
           <i className="fas fa-plus"></i> Agendar Nova Visita
         </button>
@@ -273,7 +294,13 @@ function VisitScheduler() {
         ) : visits.length === 0 ? (
           <div className="no-visits">Nenhuma visita agendada</div>
         ) : (
-          visits.map((visit) => (
+          visits
+            .filter(visit => {
+              if (filter === 'confirmed') return visit.status === 'confirmed';
+              if (filter === 'pending') return visit.status !== 'confirmed';
+              return true; // 'all' filter
+            })
+            .map((visit) => (
             <div key={visit.id} className={`visit-card ${getVisitStatusClass(visit)}`}>
               <div className="visit-header">
                 <h4>{visit.customer_name}</h4>

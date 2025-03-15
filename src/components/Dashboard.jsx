@@ -9,11 +9,16 @@ function Dashboard({ budgets, customers, visits }) {
   const currentYear = today.getFullYear();
 
   const monthlyBudgets = budgets.filter(budget => {
-    const budgetDate = new Date(budget.creationDate);
+    const budgetDate = new Date(budget.created_at);
     return budgetDate.getMonth() === currentMonth && budgetDate.getFullYear() === currentYear;
   });
 
-  const finalizedBudgets = budgets.filter(budget => budget.status === 'finalizado');
+  const finalizedBudgets = budgets.filter(budget => {
+    const budgetDate = new Date(budget.created_at);
+    return budget.status === 'finalizado' && 
+           budgetDate.getMonth() === currentMonth && 
+           budgetDate.getFullYear() === currentYear;
+  });
   const numberOfCustomers = customers.length;
   const numberOfVisits = visits.length;
 
@@ -40,7 +45,7 @@ function Dashboard({ budgets, customers, visits }) {
       <div className="dashboard-item">
         <h3>Agendamentos de Visitas</h3>
         <p>{numberOfVisits}</p>
-        <Link to="/">Mais informações</Link>
+        <Link to="/visits">Mais informações</Link>
       </div>
     </div>
   );

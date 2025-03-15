@@ -22,6 +22,25 @@
   gap: 12px;
 }
 
+@media (max-width: 768px) {
+  .customers-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-input {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
 .search-container {
   position: relative;
 }
@@ -70,6 +89,12 @@
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 16px;
   margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .customers-list {
+    grid-template-columns: 1fr;
+  }
 }
 
 .customer-card {
