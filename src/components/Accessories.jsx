@@ -55,12 +55,12 @@ function Accessories() {
     return cost + (cost * (margin / 100));
   };
 
-  const handleInputChange = useCallback(debounce((e) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewAccessory(prev => ({ ...prev, [name]: value }));
-  }, 300), []);
+  };
 
-  const handleColorInputChange = useCallback(debounce((e) => {
+  const handleColorInputChange = (e) => {
     const { name, value } = e.target;
     setNewColor(prev => {
       const updates = { ...prev, [name]: value };
@@ -74,7 +74,7 @@ function Accessories() {
 
       return updates;
     });
-  }, 300), []);
+  };
 
   const handleAddColor = () => {
     if (!newColor.color.trim() || newColor.cost_price < 0) {
