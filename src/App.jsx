@@ -479,7 +479,7 @@ function App() {
       </main>
       
       <footer className="app-footer">
-        <p>© 2025 Vecchio Sistemas <ConnectionStatus /></p>
+        <div>© 2025 Vecchio Sistemas <ConnectionStatus /></div>
       </footer>
     </div>
   );

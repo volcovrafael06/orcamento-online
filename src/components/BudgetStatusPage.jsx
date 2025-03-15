@@ -108,7 +108,7 @@ function BudgetStatusPage({ budgets, setBudgets, validadeOrcamento }) {
 
   return (
     <div>
-      <h2>Orçamentos Existentes</h2>
+      <h2>Orçamentos</h2>
       <BudgetList
         budgets={budgets}
         validadeOrcamento={validadeOrcamento}

@@ -57,8 +57,6 @@ function BudgetList({ budgets, validadeOrcamento, onFinalizeBudget, onCancelBudg
 
   return (
     <div>
-      <h2>Lista de Orçamentos</h2>
-
       <Link to="/budgets/new" className="new-budget-button">Novo Orçamento</Link>
 
       <div className="budget-list">

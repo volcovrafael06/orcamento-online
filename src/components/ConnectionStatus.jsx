@@ -56,7 +56,7 @@ function ConnectionStatus() {
         <div className="status-message">
           <strong>Serviço indisponível</strong>
           {connectionStatus.error && (
-            <p className="error-details">{connectionStatus.error}</p>
+            <span className="error-details">{connectionStatus.error}</span>
           )}
           <button onClick={checkConnection} className="retry-button">
             Tentar novamente
@@ -72,9 +72,9 @@ function ConnectionStatus() {
       <div className="status-message">
         <strong>Conectado</strong>
         {connectionStatus.lastChecked && (
-          <p className="status-time">
+          <span className="status-time">
             Última verificação: {connectionStatus.lastChecked.toLocaleTimeString()}
-          </p>
+          </span>
         )}
       </div>
     </div>

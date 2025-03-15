@@ -63,6 +63,7 @@ function Login({ onLogin }) {
         </div>
         <button 
           onClick={handleLogin}
+          className="ripple-effect btn-hover-effect"
           style={{
             width: '100%',
             padding: '12px',

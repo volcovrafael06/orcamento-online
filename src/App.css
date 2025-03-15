@@ -1,6 +1,7 @@
 /* Modern styles for App.css */
 :root {
   --primary-color: #ff4757;
+  --secondary-color: #3498db;
   --text-color: #ffffff;
   --bg-dark: #1a1a1a;
   --bg-light: #f8f9fa;
@@ -9,6 +10,8 @@
   --sidebar-width: 60px;
   --sidebar-expanded-width: 200px;
   --transition-speed: 0.3s;
+  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --border-radius: 8px;
 }
 
 @media (prefers-color-scheme: light) {
@@ -21,10 +24,28 @@
 }
 
 /* Responsive breakpoints */
+@media (max-width: 1200px) {
+  :root {
+    --sidebar-expanded-width: 180px;
+  }
+}
+
+@media (max-width: 992px) {
+  :root {
+    --sidebar-expanded-width: 160px;
+  }
+}
+
 @media (max-width: 768px) {
   :root {
     --sidebar-width: 0;
     --sidebar-expanded-width: 200px;
+  }
+}
+
+@media (max-width: 576px) {
+  :root {
+    --sidebar-expanded-width: 100%;
   }
 }
 
@@ -164,17 +185,51 @@ body {
 .sync-button,
 .action-button {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius);
   cursor: pointer;
   font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color var(--transition-speed);
+  transition: all var(--transition-speed) ease;
   color: var(--text-color);
   gap: 8px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--box-shadow);
+}
+
+.sync-button::after,
+.action-button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+.sync-button:active::after,
+.action-button:active::after {
+  animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(20, 20);
+    opacity: 0;
+  }
 }
 
 .sync-button {
@@ -183,6 +238,8 @@ body {
 
 .sync-button:hover:not(:disabled) {
   background-color: #ff5f6d;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(255, 71, 87, 0.2);
 }
 
 .sync-button:disabled {
@@ -197,6 +254,8 @@ body {
 
 .action-button:hover {
   background-color: var(--link-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Main Content Styles */
@@ -243,10 +302,16 @@ body {
 
 .dashboard-item {
   background: var(--bg-dark);
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   padding: 20px;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--box-shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dashboard-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
 }
 
 /* Home Page Styles */
@@ -483,11 +548,11 @@ body {
 
 .visit-card {
   background: white;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   padding: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--box-shadow);
   border: 1px solid #e0e0e0;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .visit-card:hover {
@@ -563,15 +628,36 @@ body {
 }
 
 .btn {
-  padding: 8px 16px;
+  padding: 10px 16px;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius);
   cursor: pointer;
   font-size: 0.9rem;
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--box-shadow);
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+.btn:active::after {
+  animation: ripple 0.6s ease-out;
 }
 
 .btn i {
@@ -585,6 +671,8 @@ body {
 
 .btn-primary:hover {
   background-color: #1565C0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(25, 118, 210, 0.2);
 }
 
 .btn-edit {
@@ -594,6 +682,8 @@ body {
 
 .btn-edit:hover {
   background-color: #E0E0E0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
 .btn-confirm {
@@ -603,6 +693,8 @@ body {
 
 .btn-confirm:hover {
   background-color: #388E3C;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(76, 175, 80, 0.2);
 }
 
 .loading, .error, .no-visits {
