@@ -1,9 +1,10 @@
 .settings-section {
-  margin: 10px;
-  padding: 15px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-}
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  max-width: 1200px;
 
 .settings-section h3 {
   color: #2c3e50;
@@ -94,13 +95,18 @@
 }
 
 .save-button {
-  background-color: #2ecc71;
+  background-color: #4CAF50;
   color: white;
-  font-weight: bold;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.5px;
 }
 
 .save-button:hover {
-  background-color: #27ae60;
+  background-color: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
 .save-button:disabled {
