@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
+import html2canvas from 'html2canvas';
 import './BudgetDetailsPage.css';
 import { supabase } from '../supabase/client';
 
@@ -108,12 +108,7 @@ function BudgetDetailsPage({ companyLogo }) {
   }, [budgetId]);
 
   const formatCurrency = (value) => {
-    // Limitar o número de casas decimais para evitar valores muito longos
-    return Number(value).toLocaleString('pt-BR', { 
-      style: 'currency', 
-      currency: 'BRL',
-      maximumFractionDigits: 2
-    });
+    return Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
   const getProductDetails = (productId) => {
@@ -121,29 +116,12 @@ function BudgetDetailsPage({ companyLogo }) {
   };
 
   const formatProductDescription = (product, item) => {
-    // Extrair o percentual do nome do produto se for um SCREEN
-    let screenPercentage = '';
-    if (product.nome && product.nome.includes('SCREEN') && product.nome.includes('%')) {
-      // Tenta extrair o percentual do nome do produto
-      const percentMatch = product.nome.match(/SCREEN\s*(\d+)%/);
-      if (percentMatch && percentMatch[1]) {
-        screenPercentage = `SCREEN ${percentMatch[1]}%`;
-      }
-    }
-
-    let parts = [];
-    
-    if (screenPercentage) {
-      parts.push(screenPercentage);
-    } else if (product.nome) {
-      parts.push(product.nome);
-    }
-    
-    if (product.modelo) parts.push(product.modelo);
-    if (product.tecido) parts.push(product.tecido);
-    if (product.codigo) parts.push(product.codigo);
-    
-    let description = parts.filter(Boolean).join(' - ');
+    let description = [
+      product.nome || 'Produto',
+      product.modelo || '',
+      product.tecido || '',
+      product.codigo || ''
+    ].filter(Boolean).join(' - ');
 
     if (item.bando) {
       description += ' COM BANDO';
@@ -155,7 +133,7 @@ function BudgetDetailsPage({ companyLogo }) {
 
     return description;
   };
-  
+
   const getAccessoryName = (accessoryId) => {
     if (!accessories || !accessoryId) return 'Acessório não encontrado';
     const accessory = accessories.find(a => a.id === accessoryId);
@@ -167,141 +145,47 @@ function BudgetDetailsPage({ companyLogo }) {
   };
 
   const handlePrintPDF = async () => {
-    try {
-      const content = contentRef.current;
-      
-      if (!content) return;
-
-      // Use standard A4 dimensions
-      const doc = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-        compress: true
-      });
-      
-      // Fix table column widths before capturing
-      const tables = content.querySelectorAll('table');
-      tables.forEach(table => {
-        table.style.width = '100%';
-        table.style.tableLayout = 'fixed';
-        
-        // Ensure the correct column widths are applied
-        const rows = table.querySelectorAll('tr');
-        rows.forEach(row => {
-          const cells = row.querySelectorAll('td');
-          if (cells.length === 3) {
-            cells[0].style.width = '70%';
-            cells[1].style.width = '15%';
-            cells[2].style.width = '15%';
-            
-            // Make sure the first cell content is fully visible
-            cells[0].style.wordBreak = 'break-word';
-            cells[0].style.whiteSpace = 'normal';
-            cells[0].style.overflowWrap = 'break-word';
-            cells[0].style.maxWidth = '70%';
-            cells[0].style.padding = '10px';
-          }
-        });
-        
-        // Set background color for header cells
-        const headerCells = table.querySelectorAll('tr:first-child td');
-        headerCells.forEach(cell => {
-          cell.style.backgroundColor = '#f2f2f2';
-        });
-      });
-      
-      // Use html2canvas with higher quality settings
-      const canvas = await html2canvas(content, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        allowTaint: true,
-        backgroundColor: '#ffffff'
-      });
-      
-      const imgData = canvas.toDataURL('image/png');
-      
-      // Calculate dimensions
-      const pdfWidth = doc.internal.pageSize.getWidth();
-      const pdfHeight = doc.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      
-      // Calculate scaling to fit width
-      const scale = pdfWidth / imgWidth;
-      const scaledHeight = imgHeight * scale;
-      
-      // Add to PDF
-      let heightLeft = scaledHeight;
-      let position = 0;
-      
-      // First page
+    const doc = new jsPDF();
+    const content = contentRef.current;
+    
+    if (!content) return;
+    
+    // Use html2canvas to capture the exact layout
+    const canvas = await html2canvas(content, {
+      scale: 2, // Higher quality
+      useCORS: true, // Allow loading external images
+      logging: false
+    });
+    
+    const imgData = canvas.toDataURL('image/png');
+    
+    // Add the captured image to PDF
+    const pdfWidth = doc.internal.pageSize.getWidth();
+    const pdfHeight = doc.internal.pageSize.getHeight();
+    const imgWidth = canvas.width;
+    const imgHeight = canvas.height;
+    
+    // Calculate scaling to fit the page width while maintaining aspect ratio
+    const scale = pdfWidth / imgWidth;
+    const scaledHeight = imgHeight * scale;
+    
+    // Add multiple pages if content is too long
+    let heightLeft = scaledHeight;
+    let position = 0;
+    
+    // First page
+    doc.addImage(imgData, 'PNG', 0, position, pdfWidth, scaledHeight);
+    heightLeft -= pdfHeight;
+    
+    // Add new pages if needed
+    while (heightLeft >= 0) {
+      position = heightLeft - scaledHeight;
+      doc.addPage();
       doc.addImage(imgData, 'PNG', 0, position, pdfWidth, scaledHeight);
       heightLeft -= pdfHeight;
-      
-      // Add new pages if needed
-      while (heightLeft >= 0) {
-        position = heightLeft - scaledHeight;
-        doc.addPage();
-        doc.addImage(imgData, 'PNG', 0, position, pdfWidth, scaledHeight);
-        heightLeft -= pdfHeight;
-      }
-      
-      doc.save(`orcamento_${budgetId}.pdf`);
-    } catch (error) {
-      console.error("Error generating PDF:", error);
     }
-  };
-
-  // Function to group identical products
-  const groupIdenticalProducts = (products) => {
-    const groupedProducts = [];
-    const productMap = new Map();
     
-    products.forEach(item => {
-      const productDetails = getProductDetails(item.produto_id);
-      const itemValue = Number(item.valor_total || item.subtotal || 0);
-      
-      // Create a unique key for each product based on its characteristics
-      const key = JSON.stringify({
-        produto_id: item.produto_id,
-        largura: item.largura,
-        altura: item.altura,
-        bando: item.bando,
-        instalacao: item.instalacao,
-        trilho_tipo: item.trilho_tipo,
-        painel: item.painel,
-        // Include any other properties that make a product unique
-      });
-      
-      if (productMap.has(key)) {
-        // If we've seen this product before, increment its count and add to total
-        const existingGroup = productMap.get(key);
-        existingGroup.quantity += 1;
-        existingGroup.totalValue += itemValue;
-      } else {
-        // If this is a new product, add it to the map
-        productMap.set(key, {
-          item,
-          productDetails,
-          quantity: 1,
-          unitValue: itemValue,
-          totalValue: itemValue
-        });
-      }
-    });
-    
-    // Convert the map to an array
-    productMap.forEach(group => {
-      // Ensure unitValue is set correctly (especially for grouped items)
-      if (group.quantity > 1) {
-        group.unitValue = group.totalValue / group.quantity;
-      }
-      groupedProducts.push(group);
-    });
-    
-    return groupedProducts;
+    doc.save(`orcamento_${budgetId}.pdf`);
   };
 
   if (loading) return <p>Carregando...</p>;
@@ -321,8 +205,6 @@ function BudgetDetailsPage({ companyLogo }) {
   } catch (e) {
     console.error('Error parsing accessories:', e);
   }
-
-  const groupedProducts = groupIdenticalProducts(budgetProducts);
 
   return (
     <div className="budget-details-page">
@@ -372,76 +254,89 @@ function BudgetDetailsPage({ companyLogo }) {
           <p>Telefone: {budget.clientes.phone}</p>
         </div>
 
-        <div className="client-section">
+        <div className="budget-items">
           <h3>Itens do Orçamento</h3>
-          
-          <table border="1" cellSpacing="0" cellPadding="8" width="100%" style={{ borderCollapse: 'collapse' }}>
-            <tbody>
-              <tr style={{ backgroundColor: '#f2f2f2' }}>
-                <td width="70%" style={{ fontWeight: 'bold', textAlign: 'left' }}>DESCRIÇÃO</td>
-                <td width="15%" style={{ fontWeight: 'bold', textAlign: 'center' }}>QTD.</td>
-                <td width="15%" style={{ fontWeight: 'bold', textAlign: 'right' }}>VALOR UNIT.</td>
-              </tr>
-              
-              {groupedProducts.map((group, index) => (
-                <tr key={index}>
-                  <td style={{ 
-                    textAlign: 'left', 
-                    wordBreak: 'break-word', 
-                    maxWidth: '70%', 
-                    whiteSpace: 'normal', 
-                    overflowWrap: 'break-word',
-                    padding: '10px'
-                  }}>
-                    {formatProductDescription(group.productDetails, group.item)}
-                  </td>
-                  <td style={{ textAlign: 'center' }}>
-                    {group.quantity}
-                  </td>
-                  <td style={{ textAlign: 'right' }}>
-                    {formatCurrency(group.unitValue)}
-                  </td>
-                </tr>
-              ))}
-              
-              {budgetAccessories && budgetAccessories.length > 0 && budgetAccessories.map((item, index) => (
-                <tr key={`acc-${index}`}>
-                  <td style={{ 
-                    textAlign: 'left', 
-                    wordBreak: 'break-word', 
-                    maxWidth: '70%', 
-                    whiteSpace: 'normal', 
-                    overflowWrap: 'break-word',
-                    padding: '10px'
-                  }}>
-                    <strong>Acessório {index + 1} - </strong>{getAccessoryName(item.accessory_id)}
-                  </td>
-                  <td style={{ textAlign: 'center' }}>
-                    1
-                  </td>
-                  <td style={{ textAlign: 'right' }}>
-                    {formatCurrency(Number(item.valor_total || item.subtotal || 0))}
-                  </td>
-                </tr>
-              ))}
-              
+          <table className="budget-table">
+            <thead>
               <tr>
-                <td style={{ textAlign: 'right', fontWeight: 'bold' }}>Total:</td>
-                <td colSpan="2" style={{ textAlign: 'right', fontWeight: 'bold' }}>
-                  {formatCurrency(
-                    [...groupedProducts, ...(budgetAccessories || [])].reduce(
-                      (total, item) => total + Number(item.totalValue || item.valor_total || item.subtotal || 0),
-                      0
-                    )
-                  )}
-                </td>
+                <th className="description">Descrição</th>
+                <th className="quantity">QTD</th>
+                <th className="unit-price">VALOR UNI</th>
+                <th className="total">TOTAL</th>
               </tr>
+            </thead>
+            <tbody>
+              {(() => {
+                // Group identical products
+                const groupedProducts = {};
+                
+                budgetProducts.forEach(item => {
+                  const productDetails = getProductDetails(item.produto_id);
+                  const description = formatProductDescription(productDetails, item);
+                  
+                  // Create a key that uniquely identifies identical products
+                  const key = `${item.produto_id}_${item.width}_${item.height}_${!!item.bando}_${!!item.installation}_${item.trilho_tipo}_${!!item.painel}_${item.numFolhas}`;
+                  
+                  if (!groupedProducts[key]) {
+                    groupedProducts[key] = {
+                      description,
+                      quantity: 1,
+                      unitPrice: Number(item.valor_total || item.subtotal || 0),
+                      totalPrice: Number(item.valor_total || item.subtotal || 0),
+                      details: item
+                    };
+                  } else {
+                    groupedProducts[key].quantity += 1;
+                    groupedProducts[key].totalPrice += Number(item.valor_total || item.subtotal || 0);
+                  }
+                });
+                
+                // Convert back to array for rendering
+                return Object.values(groupedProducts).map((group, index) => (
+                  <tr key={index}>
+                    <td className="description">{group.description}</td>
+                    <td className="quantity">{group.quantity}</td>
+                    <td className="unit-price">{formatCurrency(group.unitPrice)}</td>
+                    <td className="total">{formatCurrency(group.totalPrice)}</td>
+                  </tr>
+                ));
+              })()}
+              
+              {/* Group identical accessories too */}
+              {budgetAccessories && budgetAccessories.length > 0 && (() => {
+                const groupedAccessories = {};
+                
+                budgetAccessories.forEach(item => {
+                  const accessoryName = getAccessoryName(item.accessory_id);
+                  const key = `${item.accessory_id}_${item.color}`;
+                  
+                  if (!groupedAccessories[key]) {
+                    groupedAccessories[key] = {
+                      description: accessoryName,
+                      quantity: item.quantity || 1,
+                      unitPrice: item.quantity && item.quantity > 0 ? (Number(item.valor_total || item.subtotal || 0) / item.quantity) : Number(item.valor_total || item.subtotal || 0),
+                      totalPrice: Number(item.valor_total || item.subtotal || 0)
+                    };
+                  } else {
+                    groupedAccessories[key].quantity += (item.quantity || 1);
+                    groupedAccessories[key].totalPrice += Number(item.valor_total || item.subtotal || 0);
+                  }
+                });
+                
+                return Object.values(groupedAccessories).map((group, index) => (
+                  <tr key={`acc-${index}`}>
+                    <td className="description">{group.description}</td>
+                    <td className="quantity">{group.quantity}</td>
+                    <td className="unit-price">{formatCurrency(group.unitPrice)}</td>
+                    <td className="total">{formatCurrency(group.totalPrice)}</td>
+                  </tr>
+                ));
+              })()}
             </tbody>
           </table>
-        </div>
-        
-        <div className="client-section" style={{ textAlign: 'right' }}>
-          <strong>Total do Orçamento: {formatCurrency(Number(budget.valor_total || 0))}</strong>
+          <div className="budget-total">
+            Total: {formatCurrency(Number(budget.valor_total || 0))}
+          </div>
         </div>
       </div>
 

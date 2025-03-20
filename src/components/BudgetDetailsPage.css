@@ -11,9 +11,6 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-top: 20px;
   margin-bottom: 20px;
-  width: 100%;
-  box-sizing: border-box;
-  max-width: 100%;
 }
 
 .header-section {
@@ -57,15 +54,12 @@
 }
 
 .client-section,
+.items-section,
 .totals-section,
 .observations-section {
   margin-bottom: 20px;
   padding: 10px;
   border: 1px solid #ddd;
-  width: 100%;
-  box-sizing: border-box;
-  max-width: 100%;
-  overflow: hidden;
 }
 
 .client-section {
@@ -81,56 +75,6 @@
   margin: 5px 0;
 }
 
-.client-section table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 15px;
-  border: 1px solid #ddd;
-}
-
-.client-section th,
-.client-section td {
-  padding: 8px;
-  border: 1px solid #ddd;
-  vertical-align: middle;
-}
-
-.client-section th {
-  background-color: #f2f2f2;
-  font-weight: bold;
-  text-align: left;
-}
-
-.client-section .desc-col {
-  width: 60%;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
-}
-
-.client-section .qty-col {
-  width: 15%;
-  text-align: center;
-}
-
-.client-section .price-col {
-  width: 25%;
-  text-align: right;
-}
-
-.client-section .total-row td {
-  font-weight: bold;
-  border-top: 2px solid #bbb;
-}
-
-.client-section .total-row .desc-col {
-  text-align: right;
-}
-
-.client-section .total-val {
-  text-align: right;
-}
-
 .items-section {
   margin: 20px 0;
 }
@@ -138,6 +82,30 @@
 .items-section h3 {
   font-size: 14px;
   margin: 0 0 10px 0;
+}
+
+.items-section table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.items-section th {
+  background-color: #f8f9fa;
+  padding: 12px;
+  text-align: left;
+  border-bottom: 2px solid #dee2e6;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.items-section td {
+  padding: 12px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.items-section td:last-child {
+  text-align: right;
 }
 
 .totals-section {
@@ -177,8 +145,6 @@
   padding: 20px;
   max-width: 210mm;  /* A4 width */
   margin: 20px auto;
-  width: 100%;
-  box-sizing: border-box;
 }
 
 .budget-header {
@@ -218,40 +184,45 @@
   border-collapse: collapse;
   font-size: 12px;
   margin-top: 15px;
-  table-layout: fixed;
-  box-sizing: border-box;
-  max-width: 100%;
-  overflow: hidden;
+  table-layout: fixed; /* Fixed table layout for better column control */
 }
 
-.budget-table th, .budget-table td {
-  border: 1px solid #ddd;
-  max-width: 100%;
-  overflow: visible;
-  padding: 4px 6px;
-  box-sizing: border-box;
-  display: table-cell !important;
-  visibility: visible !important;
+.budget-table th,
+.budget-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+  word-wrap: break-word; /* Ensure text wraps */
+  overflow-wrap: break-word;
+}
+
+.budget-table th.description,
+.budget-table td.description {
+  width: auto; /* Let description take available space */
+}
+
+.budget-table th.quantity,
+.budget-table td.quantity {
+  text-align: center;
+  width: 60px;
+}
+
+.budget-table th.unit-price,
+.budget-table td.unit-price {
+  text-align: right;
+  width: 110px;
+}
+
+.budget-table th.total,
+.budget-table td.total {
+  text-align: right;
+  width: 120px; /* Fixed width to ensure consistent alignment */
 }
 
 .budget-table th {
-  font-weight: bold;
-  background-color: #f4f4f4;
-}
-
-.budget-table td, .budget-table th {
-  padding: 8px;
-  box-sizing: border-box;
-}
-
-.budget-table td.unit-value, .budget-table td.total {
-  font-weight: 500;
-}
-
-.budget-table .description .item-price {
-  font-size: 11px;
-  margin-top: 4px;
-  color: #555;
+  background-color: #f5f5f5;
+  font-weight: normal;
+  color: var(--text-color);
 }
 
 .text-right {
@@ -264,10 +235,11 @@
 
 .budget-total {
   text-align: right;
-  font-size: 1.2em;
-  margin-top: 10px;
+  font-size: 12px;
+  margin-top: 20px;
   padding: 10px;
-  background-color: #f9f9f9;
+  background-color: #f5f5f5;
+  border-radius: 8px;
 }
 
 .action-buttons-container {
@@ -309,113 +281,124 @@
   margin-top: 30px;
 }
 
-.budget-items {
-  margin-top: 20px;
-}
-
-/* Budget Items Table */
-.budget-items-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  margin-bottom: 15px;
-  border: 1px solid #ddd;
-  page-break-inside: auto;
-}
-
-.budget-items-table th,
-.budget-items-table td {
-  padding: 8px;
-  border: 1px solid #ddd;
-  text-align: left;
-  vertical-align: middle;
-}
-
-.budget-items-table th {
-  background-color: #f2f2f2;
-  font-weight: bold;
-}
-
-.budget-items-table th:nth-child(1),
-.budget-items-table td:nth-child(1) {
-  text-align: left;
-  word-break: break-word;
-}
-
-.budget-items-table th:nth-child(2),
-.budget-items-table td:nth-child(2) {
-  text-align: center;
-}
-
-.budget-items-table th:nth-child(3),
-.budget-items-table td:nth-child(3) {
-  text-align: right;
-}
-
-.budget-items-table .total-row td {
-  font-weight: bold;
-  border-top: 2px solid #bbb;
-}
-
-.budget-items-table .total-label {
-  text-align: right !important;
-}
-
-.budget-items-table .total-value {
-  text-align: right !important;
-}
-
-/* Basic print styles */
 @media print {
+  @page {
+    size: A4;
+    margin: 1cm;
+  }
+
   body {
+    background: white !important;
     font-size: 12px !important;
-    width: 100% !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .budget-details-page {
     margin: 0 !important;
     padding: 0 !important;
+    max-width: none !important;
   }
-  
+
   .budget-print-layout {
-    padding: 10mm !important;
-    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
     box-shadow: none !important;
+    width: 100% !important;
   }
-  
-  .action-buttons-container, 
-  .action-buttons, 
-  button {
+
+  .budget-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    page-break-inside: avoid !important;
+  }
+
+  .budget-table th,
+  .budget-table td {
+    padding: 6px !important; /* Smaller padding for print */
+    font-size: 11px !important; /* Slightly smaller font for print */
+  }
+
+  .budget-table th.description,
+  .budget-table td.description {
+    width: auto !important;
+  }
+
+  .budget-table th.quantity,
+  .budget-table td.quantity {
+    text-align: center !important;
+    width: 50px !important;
+  }
+
+  .budget-table th.unit-price,
+  .budget-table td.unit-price {
+    text-align: right !important;
+    width: 90px !important;
+  }
+
+  .budget-table th.total,
+  .budget-table td.total {
+    text-align: right !important;
+    width: 100px !important;
+  }
+
+  .action-buttons-container {
+    display: none;
+  }
+
+  .action-buttons {
     display: none !important;
   }
-  
-  table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    table-layout: fixed !important;
+
+  .company-header {
+    margin-bottom: 20px !important;
   }
-  
-  table tr td:first-child {
-    width: 70% !important;
-    word-break: break-word !important;
-    white-space: normal !important;
-    overflow-wrap: break-word !important;
-    padding: 10px !important;
+
+  .budget-logo {
+    width: 150px !important;
   }
-  
-  table tr td:nth-child(2) {
-    width: 15% !important;
-    text-align: center !important;
+
+  .company-info {
+    font-size: 12px !important;
   }
-  
-  table tr td:nth-child(3) {
-    width: 15% !important;
-    text-align: right !important;
+
+  .budget-header h1 {
+    font-size: 16px !important;
+    font-weight: normal !important;
   }
-  
-  table td {
+
+  .budget-dates {
+    font-size: 12px !important;
+  }
+
+  .client-info {
     border: 1px solid #000 !important;
+    padding: 15px !important;
   }
-  
-  @page {
-    margin: 10mm !important;
-    size: portrait !important;
+
+  .budget-table th,
+  .budget-table td {
+    border: 1px solid #000 !important;
+    padding: 8px !important;
+    font-size: 12px !important;
+  }
+
+  .budget-table th.total,
+  .budget-table td.total {
+    text-align: right !important;
+    width: 120px !important;
+  }
+
+  .budget-total {
+    font-size: 12px !important;
+    background-color: #f5f5f5 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide all other elements */
+  body > *:not(.budget-details-page) {
+    display: none !important;
   }
 }

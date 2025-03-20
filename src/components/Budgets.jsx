@@ -249,6 +249,8 @@ function Budgets({ budgets, setBudgets, customers: initialCustomers, products: i
                 installationValue: p.valor_instalacao || 0,
                 trilho_tipo: p.trilho_tipo || '',
                 valor_trilho: p.valor_trilho || 0,
+                painel: false,
+                numFolhas: 1,
                 subtotal: p.subtotal || 0,
                 usedMinimum: false // Add this since we're using existing values
               };
@@ -293,29 +295,58 @@ function Budgets({ budgets, setBudgets, customers: initialCustomers, products: i
     const inputWidth = parseFloat(width) || 0;
     const inputHeight = parseFloat(height) || 0;
     
-    const minWidth = parseFloat(product.largura_minima) || 0;
-    const minHeight = parseFloat(product.altura_minima) || 0;
-    const minArea = parseFloat(product.area_minima) || 0;
+    let minWidth = parseFloat(product.largura_minima) || 0;
+    let minHeight = parseFloat(product.altura_minima) || 0;
+    let minArea = parseFloat(product.area_minima) || 0;
     
+    // Special case for SCREEN 0,5 PREMIUM - ensure it has the correct minimum area
+    if (product.nome === 'SCREEN 0,5 PREMIUM' || product.nome === 'SCREEN 0.5 PREMIUM') {
+      minArea = 1.5;
+      
+      // Calculate minimum dimensions based on the correct minimum area
+      // If current dimensions don't provide enough area, adjust them
+      const currentArea = inputWidth * inputHeight;
+      if (currentArea < minArea) {
+        // If the dimensions are square (or nearly square), adjust both proportionally
+        if (Math.abs(inputWidth - inputHeight) < 0.1) {
+          const sideDimension = Math.sqrt(minArea);
+          minWidth = sideDimension;
+          minHeight = sideDimension;
+        } 
+        // Otherwise, maintain aspect ratio but scale up to reach minimum area
+        else {
+          const ratio = inputWidth / inputHeight;
+          minHeight = Math.sqrt(minArea / ratio);
+          minWidth = minHeight * ratio;
+        }
+      }
+      
+      console.log('Fixed minimum area for SCREEN 0,5 PREMIUM to 1.5m² with dimensions', minWidth.toFixed(2), 'x', minHeight.toFixed(2));
+    }
+    
+    // For display purposes, we'll keep the original input dimensions
+    // For pricing calculations, we'll use the minimum dimensions if necessary
     let finalWidth = Math.max(inputWidth, minWidth);
     let finalHeight = Math.max(inputHeight, minHeight);
     
     const area = inputWidth * inputHeight;
     const isUsingMinimum = finalWidth > inputWidth || finalHeight > inputHeight || (minArea > 0 && area < minArea);
     
+    // Calculate the final area for pricing purposes
+    let finalArea = finalWidth * finalHeight;
+    
     if (minArea > 0 && area < minArea) {
-      const ratio = Math.sqrt(minArea / area);
-      finalWidth = Math.max(inputWidth * ratio, minWidth);
-      finalHeight = Math.max(inputHeight * ratio, minHeight);
+      // Use the exact minimum area value directly for pricing
+      finalArea = minArea;
     }
     
     // Apply 10% increase to area if Painel is selected
-    let finalArea = finalWidth * finalHeight;
     if (isPainel) {
       finalArea = finalArea * 1.1; // 10% increase
     }
     
     return {
+      // Return both the pricing dimensions and the input dimensions
       width: finalWidth,
       height: finalHeight,
       area: finalArea,
@@ -1239,14 +1270,14 @@ function Budgets({ budgets, setBudgets, customers: initialCustomers, products: i
                 {newBudget.products.map((prod, index) => (
                   <div key={index} className="added-product-item">
                     <div className="product-info">
-                      <p><strong>Produto {index + 1} - {prod.product.nome}</strong></p>
+                      <p><strong>{prod.product.nome}</strong></p>
                       <p>
                         Dimensões digitadas: {prod.inputWidth.toFixed(2)}m x {prod.inputHeight.toFixed(2)}m
                       </p>
                       {prod.usedMinimum && (
                         <>
                           <p className="minimum-warning">
-                            USANDO VALORES MINIMOS {prod.width.toFixed(2)}m x {prod.height.toFixed(2)}m
+                            DIMENSÕES MÍNIMAS PARA CÁLCULO: {prod.width.toFixed(2)}m x {prod.height.toFixed(2)}m
                           </p>
                         </>
                       )}
@@ -1355,7 +1386,7 @@ function Budgets({ budgets, setBudgets, customers: initialCustomers, products: i
               {newBudget.accessories.map((acc, index) => (
                 <div key={index} className="added-accessory-item">
                   <div className="accessory-info">
-                    <p><strong>Acessório {index + 1} - {acc.accessory.name}</strong></p>
+                    <p><strong>{acc.accessory.name}</strong></p>
                     <p>Cor: {acc.color}</p>
                     <p>Quantidade: {acc.quantity}</p>
                     <p>Preço unitário: R$ {acc.accessory.colors.find(c => c.color === acc.color)?.sale_price.toFixed(2)}</p>

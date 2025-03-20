@@ -60,23 +60,37 @@ function Reports({ budgets: initialBudgets }) {
     
     const minWidth = parseFloat(product.largura_minima) || 0;
     const minHeight = parseFloat(product.altura_minima) || 0;
+    const minArea = parseFloat(product.area_minima) || 0;
     
-    const finalWidth = Math.max(parseFloat(width) || 0, minWidth);
-    const finalHeight = Math.max(parseFloat(height) || 0, minHeight);
+    let finalWidth = Math.max(parseFloat(width) || 0, minWidth);
+    let finalHeight = Math.max(parseFloat(height) || 0, minHeight);
     
-    const usedMinimum = finalWidth > parseFloat(width) || finalHeight > parseFloat(height);
+    const area = parseFloat(width || 0) * parseFloat(height || 0);
+    
+    // Calculate the final area
+    let finalArea = finalWidth * finalHeight;
+    
+    // If the calculated area is less than the minimum area, use the exact minimum area value directly
+    // This ensures the area matches exactly what's in the database
+    if (minArea > 0 && area < minArea) {
+      finalArea = minArea;
+    }
+    
+    const usedMinimum = finalWidth > parseFloat(width || 0) || finalHeight > parseFloat(height || 0) || (minArea > 0 && area < minArea);
     
     console.log('Dimensões calculadas:', {
       width: finalWidth,
       height: finalHeight,
+      area: finalArea,
       usedMinimum,
-      minimos: { minWidth, minHeight },
-      originais: { width, height }
+      minimos: { minWidth, minHeight, minArea },
+      originais: { width, height, area }
     });
 
     return {
       width: finalWidth,
       height: finalHeight,
+      area: finalArea,
       usedMinimum
     };
   };
