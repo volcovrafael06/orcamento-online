@@ -300,7 +300,7 @@ function Budgets({ budgets, setBudgets, customers: initialCustomers, products: i
     let minArea = parseFloat(product.area_minima) || 0;
     
     // Special case for SCREEN 0,5 PREMIUM - ensure it has the correct minimum area
-    if (product.nome === 'SCREEN 0,5 PREMIUM' || product.nome === 'SCREEN 0.5 PREMIUM') {
+    if (product.nome === 'SCREEN 0,5 PREMIUM' || product.nome === 'SCREEN 0.5 PREMIUM' || product.nome === 'PARIS BK') {
       minArea = 1.5;
       
       // Calculate minimum dimensions based on the correct minimum area
