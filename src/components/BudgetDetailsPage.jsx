@@ -257,12 +257,18 @@ function BudgetDetailsPage({ companyLogo }) {
         <div className="budget-items">
           <h3>Itens do Orçamento</h3>
           <table className="budget-table">
+            <colgroup>
+              <col className="col-description" />
+              <col className="col-quantity" />
+              <col className="col-unit-price" />
+              <col className="col-total" />
+            </colgroup>
             <thead>
               <tr>
-                <th className="description">Descrição</th>
+                <th className="description">DESCRIÇÃO</th>
                 <th className="quantity">QTD</th>
-                <th className="unit-price">VALOR UNI</th>
-                <th className="total">TOTAL</th>
+                <th className="unit-price">VALOR UNIT.</th>
+                <th className="total">VALOR TOTAL</th>
               </tr>
             </thead>
             <tbody>

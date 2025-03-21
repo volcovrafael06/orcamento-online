@@ -496,7 +496,9 @@ body {
   nav,
   header,
   footer,
-  .action-buttons {
+  .action-buttons,
+  .app-footer,
+  .menu-toggle {
     display: none !important;
   }
 
@@ -505,6 +507,8 @@ body {
     margin: 0 !important;
     padding: 0 !important;
     background: white !important;
+    font-size: 12px !important;
+    width: 100% !important;
   }
 
   /* Remove any fixed positioning */
@@ -518,6 +522,27 @@ body {
     visibility: visible !important;
     position: static !important;
     overflow: visible !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Ensure main content takes full width */
+  .main-content {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Make sure the page breaks properly */
+  .budget-print-layout {
+    page-break-inside: avoid !important;
+  }
+  
+  /* Set page size and orientation */
+  @page {
+    size: A4 portrait;
+    margin: 0.5cm;
   }
 }
 
