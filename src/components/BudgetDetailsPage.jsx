@@ -400,8 +400,11 @@ function BudgetDetailsPage({ companyLogo }) {
                   const productDetails = getProductDetails(item.produto_id);
                   const description = formatProductDescription(productDetails, item);
                   
-                  // Create a key that uniquely identifies identical products
-                  const key = `${item.produto_id}_${item.width}_${item.height}_${!!item.bando}_${!!item.installation}_${item.trilho_tipo}_${!!item.painel}_${item.numFolhas}`;
+                  // Create a key that uniquely identifies products with same model, size and value
+                  const productModel = productDetails.modelo || '';
+                  const productSize = `${item.width || 0}_${item.height || 0}`;
+                  const productValue = Number(item.valor_total || item.subtotal || 0);
+                  const key = `${productModel}_${productSize}_${productValue}`;
                   
                   if (!groupedProducts[key]) {
                     groupedProducts[key] = {
