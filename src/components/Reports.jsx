@@ -16,8 +16,11 @@ function Reports({ budgets: initialBudgets }) {
     cancelled: 0,
     averageTicket: 0,
     totalRevenue: 0,
-    totalCosts: 0,
-    totalProfit: 0,
+    totalCosts: 0, // Renomeado para totalCOGS (Custo dos Produtos Vendidos)
+    totalCOGS: 0, // Custo dos Produtos Vendidos
+    grossProfit: 0, // Lucro Bruto
+    operatingExpenses: 0, // Despesas Operacionais (inicialmente 0)
+    netProfit: 0, // Lucro Líquido
     profitMargin: 0,
     totalInstallation: 0
   });
@@ -47,7 +50,7 @@ function Reports({ budgets: initialBudgets }) {
     };
 
     fetchBudgets();
-  }, [period, startDate, endDate]);
+  }, [period, startDate, endDate]); // Dependências mantidas
 
   useEffect(() => {
     if (budgets.length > 0) {
@@ -523,13 +526,13 @@ function Reports({ budgets: initialBudgets }) {
             
             <div className="summary-card">
               <h3>Desempenho Financeiro</h3>
-              <p>Receita Total (com instalação): {summary.totalRevenue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-              <p>Receita Total (sem instalação): {(summary.totalRevenue - summary.totalInstallation).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-              <p>Custos Totais: {summary.totalCosts.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-              <p>Total Instalação (repasse): {summary.totalInstallation.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-              <p>Lucro Total: {summary.totalProfit.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-              <p>Margem de Lucro: {summary.profitMargin.toFixed(2)}%</p>
-              <p>Ticket Médio (sem instalação): {(summary.totalRevenue / summary.finalized - (summary.totalInstallation / summary.finalized)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+              <p>Receita Total (com instalação): {(summary.totalRevenue || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+              <p>Receita Total (sem instalação): {((summary.totalRevenue || 0) - (summary.totalInstallation || 0)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+              <p>Custos Totais: {(summary.totalCosts || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+              <p>Total Instalação (repasse): {(summary.totalInstallation || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+              <p>Lucro Total: {(summary.totalProfit || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+              <p>Margem de Lucro: {(summary.profitMargin || 0).toFixed(2)}%</p>
+              <p>Ticket Médio (sem instalação): {(summary.finalized > 0 ? ((summary.totalRevenue || 0) / summary.finalized - (summary.totalInstallation || 0) / summary.finalized) : 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
             </div>
           </div>
 
@@ -573,51 +576,68 @@ function Reports({ budgets: initialBudgets }) {
                       <td colSpan="10">
                         <div className="product-details">
                           <h4>Detalhes dos Produtos</h4>
-                          {(budget.produtos || []).map((prod, index) => (
-                            <div key={index} className="product-detail-item">
-                              <h5>Produto {index + 1}: {prod.produto?.nome || 'Nome não encontrado'}</h5>
-                              
-                              <div className="product-info-section">
-                                <p>Dimensões: {prod.largura || prod.width}m x {prod.altura || prod.height}m</p>
-                                <p>Custo do Produto: {parseFloat(prod.cost?.productCost || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                                <p>Valor do Produto: {parseFloat(prod.cost?.productValue || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                                
-                                {prod.bando && (
-                                  <div className="bando-section">
-                                    <h6>Bandô:</h6>
-                                    <p>Custo: {parseFloat(prod.cost?.bandoCost || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                                    <p>Venda: {parseFloat(prod.cost?.bandoValue || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                                    <p>Lucro: {parseFloat((prod.cost?.bandoValue || 0) - (prod.cost?.bandoCost || 0)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                                  </div>
-                                )}
-
-                                {prod.trilho_tipo && (
-                                  <div className="trilho-section">
-                                    <h6>Trilho - {prod.trilho_tipo}:</h6>
-                                    <p>Custo: {parseFloat(prod.cost?.trilhoCost || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                                    <p>Venda: {parseFloat(prod.cost?.trilhoValue || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                                    <p>Lucro: {parseFloat((prod.cost?.trilhoValue || 0) - (prod.cost?.trilhoCost || 0)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                                  </div>
-                                )}
-
-                                {prod.instalacao && (
-                                  <div className="installation-section">
-                                    <h6>Instalação:</h6>
-                                    <p>Valor: {parseFloat(prod.valor_instalacao || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                                  </div>
-                                )}
-
-                                <p className="total-section">
-                                  <strong>Total do Produto: {parseFloat(
-                                    (prod.cost?.productValue || 0) + 
-                                    (prod.cost?.bandoValue || 0) + 
-                                    (prod.cost?.trilhoValue || 0) +
-                                    (prod.instalacao ? (parseFloat(prod.valor_instalacao) || 0) : 0)
-                                  ).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>
-                                </p>
-                              </div>
-                            </div>
-                          ))}
+                          <table className="product-details-table">
+                            <thead>
+                              <tr>
+                                <th>Produto</th>
+                                <th>Dimensões</th>
+                                <th>Custo</th>
+                                <th>Valor</th>
+                                <th>Lucro</th>
+                                <th>Bandô</th>
+                                <th>Trilho</th>
+                                <th>Instalação</th>
+                                <th>Subtotal</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {(budget.produtos || []).map((prod, index) => (
+                                <tr key={index} className="product-detail-row">
+                                  <td>
+                                    <strong>{prod.produto?.nome || 'Nome não encontrado'}</strong>
+                                    {prod.cost?.dimensions?.usedMinimum && (
+                                      <div className="minimum-warning">
+                                        Dimensões mínimas aplicadas
+                                      </div>
+                                    )}
+                                  </td>
+                                  <td>{prod.largura || prod.width}m x {prod.altura || prod.height}m</td>
+                                  <td>{parseFloat(prod.cost?.productCost || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                                  <td>{parseFloat(prod.cost?.productValue || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                                  <td>{parseFloat((prod.cost?.productValue || 0) - (prod.cost?.productCost || 0)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                                  <td>
+                                    {prod.bando ? (
+                                      <div>
+                                        <div>Custo: {parseFloat(prod.cost?.bandoCost || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                        <div>Venda: {parseFloat(prod.cost?.bandoValue || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                        <div>Lucro: {parseFloat((prod.cost?.bandoValue || 0) - (prod.cost?.bandoCost || 0)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                      </div>
+                                    ) : 'Não'}
+                                  </td>
+                                  <td>
+                                    {prod.trilho_tipo ? (
+                                      <div>
+                                        <div><strong>{prod.trilho_tipo}</strong></div>
+                                        <div>Custo: {parseFloat(prod.cost?.trilhoCost || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                        <div>Venda: {parseFloat(prod.cost?.trilhoValue || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                        <div>Lucro: {parseFloat((prod.cost?.trilhoValue || 0) - (prod.cost?.trilhoCost || 0)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                      </div>
+                                    ) : 'Não'}
+                                  </td>
+                                  <td>
+                                    {prod.instalacao ? (
+                                      <div>
+                                        <div>Valor: {parseFloat(prod.valor_instalacao || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                      </div>
+                                    ) : 'Não'}
+                                  </td>
+                                  <td className="product-subtotal">
+                                    <strong>{parseFloat(prod.total || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
                       </td>
                     </tr>

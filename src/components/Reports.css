@@ -77,6 +77,67 @@
   overflow: visible;
 }
 
+.product-details-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  background-color: white;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.product-details-table th,
+.product-details-table td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #dee2e6;
+  vertical-align: top;
+}
+
+.product-details-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+}
+
+.product-details-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.product-detail-row td {
+  font-size: 0.9em;
+}
+
+.product-subtotal {
+  font-weight: bold;
+  text-align: right;
+  background-color: #f8f9fa;
+}
+
+.product-extras-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  flex: 2;
+}
+
+.extra-item {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+}
+
+.total-section {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  text-align: right;
+  font-weight: bold;
+}
+
 .details-row td {
   padding: 0;
 }
@@ -114,7 +175,7 @@
   color: #444;
   white-space: normal;
   word-wrap: break-word;
-  max-width: 200px;
+  /* max-width: 200px; */ /* Removido para corrigir layout dos detalhes */
   vertical-align: top;
 }
 
@@ -176,8 +237,7 @@
 .bando-section,
 .installation-section,
 .trilho-section {
-  margin: 15px 0;
-  padding: 10px;
+  margin: 5px 0;
   background-color: #f8f9fa;
   border-radius: 4px;
 }
@@ -194,6 +254,9 @@
   margin-top: 15px;
   padding-top: 10px;
   border-top: 1px solid #dee2e6;
+  width: 100%;
+  text-align: right;
+  font-weight: bold;
 }
 
 .minimum-warning {
