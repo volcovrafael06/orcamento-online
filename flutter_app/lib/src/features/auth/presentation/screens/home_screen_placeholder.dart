@@ -24,14 +24,40 @@ class HomeScreenPlaceholder extends ConsumerWidget {
         ],
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(user != null ? 'Logado como: ${user.email}' : 'Não logado'),
-            const SizedBox(height: 20),
-            const Text('Bem-vindo à Página Inicial!'),
-            // Aqui virá o conteúdo principal do app
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                user != null ? 'Logado como: ${user.email}' : 'Não logado',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Bem-vindo à Página Inicial!',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 40),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.people),
+                label: const Text('Gerenciar Clientes'),
+                onPressed: () {
+                  // Navegar para a lista de clientes
+                  GoRouter.of(context).go('/customers');
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  textStyle: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              // Adicionar mais botões para outras funcionalidades aqui
+              // Ex: Produtos, Orçamentos, etc.
+            ],
+          ),
         ),
       ),
     );

@@ -4,33 +4,36 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:persifix_app/src/features/auth/presentation/providers/auth_providers.dart';
 import 'package:persifix_app/src/features/auth/presentation/screens/login_screen.dart';
 import 'package:persifix_app/src/features/auth/presentation/screens/home_screen_placeholder.dart';
+import 'package:persifix_app/src/features/customers/presentation/screens/customers_screen.dart';
+import 'package:persifix_app/src/features/customers/presentation/screens/add_edit_customer_screen.dart';
+import 'package:persifix_app/src/features/customers/presentation/providers/customer_providers.dart'; // Para selectedCustomerIdProvider
 
 // Provedor para o GoRouter
 final goRouterProvider = Provider<GoRouter>((ref) {
-  final authNotifier = ref.watch(authNotifierProvider.notifier); // Para escutar o estado
+  final authNotifier = ref.watch(authNotifierProvider.notifier);
 
   return GoRouter(
-    initialLocation: '/login', // Ou '/', dependendo da lógica de redirecionamento
-    debugLogDiagnostics: true, // Útil para depuração
+    initialLocation: '/login',
+    debugLogDiagnostics: true,
 
-    // Listener para mudanças de rota e estado de autenticação
     refreshListenable: GoRouterRefreshStream(ref.watch(authNotifierProvider.notifier).authStateChangesForRouter()),
 
     redirect: (BuildContext context, GoRouterState state) {
-      final authStatus = ref.read(authNotifierProvider); // Lê o estado atual
+      final authStatus = ref.read(authNotifierProvider);
       final loggingIn = state.matchedLocation == '/login';
+      final isSplash = state.matchedLocation == '/splash'; // Exemplo se tiver splash
 
-      // Se não estiver logado e tentando acessar algo diferente de /login, redireciona para /login
+      if (isSplash) return null; // Não redirecionar se estiver no splash
+
       if (authStatus != AuthStatus.authenticated && !loggingIn) {
         return '/login';
       }
 
-      // Se estiver logado e na tela de login, redireciona para a home
       if (authStatus == AuthStatus.authenticated && loggingIn) {
         return '/';
       }
 
-      return null; // Sem redirecionamento
+      return null;
     },
 
     routes: [
@@ -43,9 +46,37 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/',
         name: 'home',
         builder: (context, state) => const HomeScreenPlaceholder(),
-        // TODO: Adicionar rotas filhas aqui para outras features
+        routes: [ // Rotas filhas da Home
+          GoRoute(
+            path: 'customers', // Será acessado como /customers
+            name: 'customers',
+            builder: (context, state) => const CustomersScreen(),
+            routes: [
+              GoRoute(
+                path: 'new', // Será /customers/new
+                name: 'newCustomer',
+                builder: (context, state) {
+                  // Ao navegar para new, garantir que não há cliente selecionado
+                  Future.microtask(() => ref.read(selectedCustomerIdProvider.notifier).state = null);
+                  return const AddEditCustomerScreen(customerId: null);
+                },
+              ),
+              GoRoute(
+                path: 'edit/:id', // Será /customers/edit/some-uuid
+                name: 'editCustomer',
+                builder: (context, state) {
+                  final customerId = state.pathParameters['id'];
+                  // Atualiza o provider do ID selecionado ANTES de construir a tela
+                  // Idealmente, a tela AddEditCustomerScreen usaria este provider para buscar os dados se necessário
+                  Future.microtask(() => ref.read(selectedCustomerIdProvider.notifier).state = customerId);
+                  return AddEditCustomerScreen(customerId: customerId);
+                },
+              ),
+            ]
+          ),
+          // Adicionar outras rotas de features aqui, como /products, /budgets etc.
+        ]
       ),
-      // Adicionar outras rotas aqui
     ],
   );
 });
