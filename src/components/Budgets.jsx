@@ -1384,17 +1384,14 @@ function Budgets({ budgets, setBudgets, customers: initialCustomers, products: i
                     </div>
                     <div className="actions">
                       <button
-                        type="button"
-<<<<<<< HEAD
-                        className="edit-button"
-                        onClick={() => handleEditProduct(index)}
-                      >
-                        Editar
-                      </button>
+                          type="button"
+                          className="edit-button"
+                          onClick={() => handleEditProduct(index)}
+                        >
+                          Editar
+                        </button>
                       <button
                         type="button"
-=======
->>>>>>> 45855276dbe2386e30f95ecc427a23cda891fba6
                         className="remove-button"
                         onClick={() => handleRemoveProduct(index)}
                       >
