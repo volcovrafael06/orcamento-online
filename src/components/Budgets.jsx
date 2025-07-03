@@ -1382,7 +1382,7 @@ function Budgets({ budgets, setBudgets, customers: initialCustomers, products: i
                       {prod.valor_trilho && <p>Valor do Trilho: R$ {prod.valor_trilho.toFixed(2)}</p>}
                       <p className="product-subtotal">Subtotal: R$ {prod.subtotal.toFixed(2)}</p>
                     </div>
-                    <div className="actions">
+                    <div className="product-actions">
                       <button
                           type="button"
                           className="edit-button"

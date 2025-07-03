@@ -6,6 +6,7 @@
   border-radius: 8px;
   padding: 15px;
   margin-bottom: 15px;
+  position: relative; /* Necessário para o posicionamento absoluto dos botões */
 }
 
 .product-info {
@@ -24,8 +25,12 @@
 }
 
 .product-actions {
+  position: absolute;
+  top: -20px; /* Move os botões para cima */
+  right: 15px;
   display: flex;
   gap: 10px;
+  z-index: 10; /* Garante que os botões fiquem sobre outros elementos */
 }
 
 .product-actions button {
