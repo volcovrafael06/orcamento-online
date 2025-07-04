@@ -188,12 +188,13 @@ function BudgetDetailsPage({ companyLogo }) {
   };
 
   const formatProductDescription = (product, item) => {
+    const dimensions = item.largura && item.altura ? `${item.largura}m x ${item.altura}m` : '';
     let description = [
       product.nome || 'Produto',
       product.modelo || '',
       product.tecido || '',
       product.codigo || '',
-      `${item.largura || item.width || 0} L x ${item.altura || item.height || 0} A`
+      dimensions
     ].filter(Boolean).join(' - ');
 
     if (item.bando) {
@@ -202,6 +203,8 @@ function BudgetDetailsPage({ companyLogo }) {
 
     if (item.instalacao) {
       description += ' INSTALADO';
+    } else {
+        description += ' SEM INSTALAÇÃO';
     }
 
     return description;
@@ -400,13 +403,8 @@ function BudgetDetailsPage({ companyLogo }) {
                 budgetProducts.forEach(item => {
                   const productDetails = getProductDetails(item.produto_id);
                   const description = formatProductDescription(productDetails, item);
-                  
-                  // Create a key that uniquely identifies products with same model, size and value
-                  const productModel = productDetails.modelo || '';
-                  const productSize = `${item.width || 0}_${item.height || 0}`;
-                  const productValue = Number(item.valor_total || item.subtotal || 0);
-                  const key = `${productModel}_${productSize}_${productValue}`;
-                  
+                  const key = description; // Group by the full description
+
                   if (!groupedProducts[key]) {
                     groupedProducts[key] = {
                       description,
