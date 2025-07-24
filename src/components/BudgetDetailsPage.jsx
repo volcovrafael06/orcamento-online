@@ -189,22 +189,37 @@ function BudgetDetailsPage({ companyLogo }) {
 
   const formatProductDescription = (product, item) => {
     const dimensions = item.largura && item.altura ? `${item.largura}m x ${item.altura}m` : '';
-    let description = [
+    let descriptionParts = [
       product.nome || 'Produto',
       product.modelo || '',
       product.tecido || '',
       product.codigo || '',
       dimensions
-    ].filter(Boolean).join(' - ');
+    ];
+
+    // Add panel details if available
+    if (item.painel && item.num_folhas) {
+      descriptionParts.push('PAINEL');
+      descriptionParts.push(`${item.num_folhas} ${item.num_folhas > 1 ? 'folhas' : 'folha'}`);
+      
+      // Calculate sheet size if we have dimensions and number of sheets
+      if (item.largura && item.altura && item.num_folhas > 1) {
+        const sheetWidth = (parseFloat(item.largura) * 1.1 / item.num_folhas).toFixed(2);
+        const sheetHeight = parseFloat(item.altura).toFixed(2);
+        descriptionParts.push(`Cada folha: ${sheetWidth}m x ${sheetHeight}m`);
+      }
+    }
+
+    let description = descriptionParts.filter(Boolean).join(' - ');
 
     if (item.bando) {
-      description += ' COM BANDO';
+      description += ' - COM BANDO';
     }
 
     if (item.instalacao) {
-      description += ' INSTALADO';
+      description += ' - INSTALADO';
     } else {
-        description += ' SEM INSTALAÇÃO';
+      description += ' - SEM INSTALAÇÃO';
     }
 
     return description;

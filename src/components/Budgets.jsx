@@ -249,8 +249,8 @@ function Budgets({ budgets, setBudgets, customers: initialCustomers, products: i
                 installationValue: p.valor_instalacao || 0,
                 trilho_tipo: p.trilho_tipo || '',
                 valor_trilho: p.valor_trilho || 0,
-                painel: false,
-                numFolhas: 1,
+                painel: p.painel || false,
+                numFolhas: p.num_folhas || 1,
                 subtotal: p.subtotal || 0,
                 usedMinimum: false // Add this since we're using existing values
               };
