@@ -189,17 +189,19 @@ function BudgetDetailsPage({ companyLogo }) {
 
   const formatProductDescription = (product, item) => {
     const dimensions = item.largura && item.altura ? `${item.largura}m x ${item.altura}m` : '';
-    let descriptionParts = [
-      product.nome || 'Produto',
-      product.modelo || '',
-      product.tecido || '',
-      product.codigo || '',
-      dimensions
-    ];
-
-    // Add panel details if available
+    
+    let descriptionParts;
+    
+    // If it's a panel, replace model with 'PAINEL'
     if (item.painel && item.num_folhas) {
-      descriptionParts.push('PAINEL');
+      descriptionParts = [
+        product.nome || 'Produto',
+        'PAINEL',
+        product.tecido || '',
+        product.codigo || '',
+        dimensions
+      ];
+      
       descriptionParts.push(`${item.num_folhas} ${item.num_folhas > 1 ? 'folhas' : 'folha'}`);
       
       // Calculate sheet size if we have dimensions and number of sheets
@@ -208,6 +210,15 @@ function BudgetDetailsPage({ companyLogo }) {
         const sheetHeight = parseFloat(item.altura).toFixed(2);
         descriptionParts.push(`Cada folha: ${sheetWidth}m x ${sheetHeight}m`);
       }
+    } else {
+      // Normal product description with model
+      descriptionParts = [
+        product.nome || 'Produto',
+        product.modelo || '',
+        product.tecido || '',
+        product.codigo || '',
+        dimensions
+      ];
     }
 
     let description = descriptionParts.filter(Boolean).join(' - ');
