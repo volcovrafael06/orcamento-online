@@ -238,10 +238,10 @@ function Budgets({ budgets, setBudgets, customers: initialCustomers, products: i
               const fullProduct = initialProducts?.find(prod => prod.id === p.produto_id) || {};
               return {
                 product: fullProduct,
-                width: p.largura || '',
-                height: p.altura || '',
-                inputWidth: p.largura || '',
-                inputHeight: p.altura || '',
+                width: p.input_width || p.largura || '',
+                height: p.input_height || p.altura || '',
+                inputWidth: p.input_width || p.largura || '',
+                inputHeight: p.input_height || p.altura || '',
                 bando: p.bando || false,
                 bandoValue: p.valor_bando || 0,
                 bandoCusto: p.valor_bando_custo || 0,
@@ -1063,6 +1063,8 @@ function Budgets({ budgets, setBudgets, customers: initialCustomers, products: i
         produto_id: product.product.id,
         largura: parseFloat(product.width),
         altura: product.height ? parseFloat(product.height) : null,
+        input_width: parseFloat(product.inputWidth) || parseFloat(product.width),
+        input_height: product.inputHeight ? parseFloat(product.inputHeight) : (product.height ? parseFloat(product.height) : null),
         bando: product.bando,
         valor_bando: product.bandoValue,
         valor_bando_custo: product.bandoCusto,

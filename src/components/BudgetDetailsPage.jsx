@@ -188,7 +188,10 @@ function BudgetDetailsPage({ companyLogo }) {
   };
 
   const formatProductDescription = (product, item) => {
-    const dimensions = item.largura && item.altura ? `${item.largura}m x ${item.altura}m` : '';
+    // Use input dimensions (as typed by user) instead of calculated dimensions
+    const inputWidth = item.input_width || item.inputWidth || item.largura;
+    const inputHeight = item.input_height || item.inputHeight || item.altura;
+    const dimensions = inputWidth && inputHeight ? `${parseFloat(inputWidth).toFixed(2)}m x ${parseFloat(inputHeight).toFixed(2)}m` : '';
     
     let descriptionParts;
     
@@ -204,10 +207,10 @@ function BudgetDetailsPage({ companyLogo }) {
       
       descriptionParts.push(`${item.num_folhas} ${item.num_folhas > 1 ? 'folhas' : 'folha'}`);
       
-      // Calculate sheet size if we have dimensions and number of sheets
-      if (item.largura && item.altura && item.num_folhas > 1) {
-        const sheetWidth = (parseFloat(item.largura) * 1.1 / item.num_folhas).toFixed(2);
-        const sheetHeight = parseFloat(item.altura).toFixed(2);
+      // Calculate sheet size using input dimensions
+      if (inputWidth && inputHeight && item.num_folhas > 1) {
+        const sheetWidth = (parseFloat(inputWidth) * 1.1 / item.num_folhas).toFixed(2);
+        const sheetHeight = parseFloat(inputHeight).toFixed(2);
         descriptionParts.push(`Cada folha: ${sheetWidth}m x ${sheetHeight}m`);
       }
     } else {
