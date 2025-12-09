@@ -1,0 +1,269 @@
+/* BudgetDetailsPage.css - VERSÃO FINAL (Proporções Otimizadas) */
+
+/* 1. RESET GLOBAL */
+* {
+  box-sizing: border-box !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+.budget-details-container {
+  background-color: #525659;
+  padding: 30px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 2. FOLHA A4 */
+.budget-print-layout {
+  background-color: white;
+  width: 210mm;
+  min-height: 297mm;
+  padding: 15mm;
+  margin: 0 auto;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+/* --- CABEÇALHO --- */
+.company-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #000;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+}
+
+.budget-logo {
+  max-width: 140px;
+  max-height: 70px;
+  object-fit: contain;
+}
+
+.company-info {
+  text-align: right;
+  font-size: 10px;
+  color: #000;
+  line-height: 1.3;
+}
+
+.budget-header {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.budget-header h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #000;
+  margin: 0;
+}
+
+.budget-header p {
+  margin: 2px 0;
+  font-size: 11px;
+  color: #000;
+}
+
+/* --- CLIENTE --- */
+.customer-info {
+  width: 100% !important;
+  border: 1px solid #000;
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 15px;
+  background-color: #fff;
+  display: block;
+}
+
+.customer-info h3 {
+  margin: 0 0 4px 0;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 4px;
+}
+
+.customer-info p {
+  margin: 2px 0;
+  font-size: 11px;
+  color: #000;
+}
+
+/* --- CONTAINER ITENS --- */
+.budget-items {
+  width: 100% !important;
+  margin-top: 10px;
+  display: block;
+}
+
+.budget-items h3 {
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #000;
+}
+
+/* --- TABELA (FIXA) --- */
+.budget-table {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  border-collapse: collapse; 
+  table-layout: fixed !important;
+  border: 1px solid #000;
+  font-size: 9px;
+}
+
+/* Células e Cabeçalhos - GERAL */
+.budget-table th, 
+.budget-table td {
+  border: 1px solid #000;
+  padding: 4px; 
+  vertical-align: middle;
+  color: #000;
+  line-height: 1.2;
+}
+
+.budget-table th {
+  background-color: #e0e0e0;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 9px;
+  padding: 6px 4px;
+}
+
+/* --- NOVAS LARGURAS DAS COLUNAS (Soma = 100%) --- */
+
+/* 1. Descrição: 28% (conforme solicitação) */
+.budget-table .col-description,
+.budget-table .description { 
+  width: 28%; 
+  text-align: left;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* 2. Ambiente: 10% */
+.budget-table .col-environment,
+.budget-table .environment { 
+  width: 10%; 
+  text-align: center;
+  overflow-wrap: break-word;
+}
+
+/* 3. Qtd: 5% */
+.budget-table .col-quantity,
+.budget-table .quantity { 
+  width: 5%;  
+  text-align: center; 
+}
+
+/* 4. Valor Unit.: 15% */
+.budget-table .col-unit-price,
+.budget-table .unit-price { 
+  width: 15%; 
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* 5. Valor Total: 18% */
+.budget-table .col-total,
+.budget-table .total { 
+  width: 18%; 
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Padding reduzido nas colunas de valor para ganhar espaço e alinhar */
+.budget-table td.unit-price,
+.budget-table td.total {
+  padding-left: 8px;
+  padding-right: 10px;
+}
+
+/* Garantir alinhamento à direita nas colunas de valor */
+.budget-table th.unit-price,
+.budget-table td.unit-price,
+.budget-table th.total,
+.budget-table td.total {
+  text-align: right !important;
+}
+
+/* --- RODAPÉ TOTAL --- */
+.budget-total {
+  width: 100% !important;
+  border: 1px solid #000;
+  border-top: none;
+  background-color: #e0e0e0;
+  
+  /* Alinhamento preciso com as colunas de tabela (2px padding right) */
+  padding: 6px 2px; 
+  
+  text-align: right;
+  font-weight: bold;
+  font-size: 12px;
+  color: #000;
+  text-transform: uppercase;
+}
+
+/* --- BOTÕES --- */
+.action-buttons-container {
+  width: 210mm;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.back-button, .print-button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 12px;
+}
+.back-button { background: #ccc; }
+.print-button { background: #000; color: #fff; }
+.action-buttons { display: none; }
+
+/* --- IMPRESSÃO --- */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  body { background: white; margin: 0; }
+  .budget-details-container { padding: 0; margin: 0; display: block; background: white; }
+  
+  .budget-print-layout {
+    width: 210mm;
+    margin: 0;
+    padding: 15mm;
+    box-shadow: none;
+    border: none;
+  }
+  .action-buttons-container { display: none !important; }
+
+  /* Evitar qualquer corte de números na impressão */
+  .budget-table td.unit-price,
+  .budget-table td.total {
+    white-space: nowrap !important;
+    overflow: visible !important;
+    padding-right: 12px !important;
+    padding-left: 10px !important;
+  }
+
+  /* Dar um pouco mais de espaço na coluna de total durante a impressão */
+  .budget-table th.total,
+  .budget-table td.total {
+    width: 20% !important;
+  }
+}
