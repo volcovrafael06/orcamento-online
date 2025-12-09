@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import html2canvas from 'html2canvas';
 import './BudgetDetailsPage.css';
 import { supabase } from '../supabase/client';
 
@@ -318,45 +319,24 @@ function BudgetDetailsPage({ companyLogo }) {
     return rows;
   };
 
-  const handleGeneratePDF = () => {
+  const handleGeneratePDF = async () => {
+    const element = contentRef.current;
+    if (!element) return;
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = { top: 20, right: 10, bottom: 18, left: 10 };
-    const head = [['DESCRIÇÃO', 'AMBIENTE', 'QTD', 'VALOR UNIT.', 'VALOR TOTAL']];
-    const body = buildPdfRows();
-    const total = formatCurrency(Number(budget.valor_total || 0));
-    doc.setFontSize(12);
-    doc.text(`Orçamento #${budget.numero_orcamento || budget.id}`, margin.left, 12);
-    doc.setFontSize(9);
-    doc.text(`Data: ${new Date(budget.created_at).toLocaleDateString()}`, margin.left, 16);
-    autoTable(doc, {
-      head,
-      body,
-      startY: 22,
-      margin,
-      styles: { fontSize: 9, cellPadding: 1, lineWidth: 0.3 },
-      columnStyles: {
-        0: { cellWidth: 89 },
-        1: { cellWidth: 40 },
-        2: { cellWidth: 11, halign: 'center' },
-        3: { cellWidth: 18, halign: 'right' },
-        4: { cellWidth: 22, halign: 'right' },
-      },
-      showHead: 'everyPage',
-      showFoot: 'lastPage',
-      foot: [
-        [
-          { content: 'TOTAL:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } },
-          { content: total, styles: { halign: 'right', fontStyle: 'bold' } }
-        ]
-      ],
-      footStyles: { fillColor: [224, 224, 224], textColor: [0,0,0], fontStyle: 'bold' },
-      didDrawPage: (data) => {
-        doc.setFontSize(9);
-        const pageNumber = `${data.pageNumber}`;
-        doc.text(pageNumber, pageWidth - margin.right, doc.internal.pageSize.getHeight() - 10, { align: 'right' });
-      }
-    });
+    const pdfWidth = doc.internal.pageSize.getWidth();
+    const pdfHeight = doc.internal.pageSize.getHeight();
+    const canvas = await html2canvas(element, { scale: 2, useCORS: true, logging: false });
+    const imgData = canvas.toDataURL('image/png');
+    const imgWidthPx = canvas.width;
+    const imgHeightPx = canvas.height;
+    const scale = pdfWidth / imgWidthPx;
+    const scaledHeight = imgHeightPx * scale;
+    let pages = Math.ceil(scaledHeight / pdfHeight);
+    for (let p = 0; p < pages; p++) {
+      const position = -p * pdfHeight;
+      if (p > 0) doc.addPage();
+      doc.addImage(imgData, 'PNG', 0, position, pdfWidth, scaledHeight);
+    }
     doc.save(`orcamento_${budgetId}.pdf`);
   };
 
