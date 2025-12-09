@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
-import html2canvas from 'html2canvas';
+import autoTable from 'jspdf-autotable';
 import './BudgetDetailsPage.css';
 import { supabase } from '../supabase/client';
 
@@ -253,48 +252,116 @@ function BudgetDetailsPage({ companyLogo }) {
     return new Date(new Date(createdAt).getTime() + validadeDias * 24 * 60 * 60 * 1000).toLocaleDateString();
   };
 
-  const handlePrintPDF = async () => {
-    const doc = new jsPDF();
-    const content = contentRef.current;
-    
-    if (!content) return;
-    
-    // Use html2canvas to capture the exact layout
-    const canvas = await html2canvas(content, {
-      scale: 2, // Higher quality
-      useCORS: true, // Allow loading external images
-      logging: false
+  const buildPdfRows = () => {
+    const rows = [];
+    const groupedProducts = {};
+    const items = JSON.parse(budget.produtos_json || '[]');
+    items.forEach(item => {
+      const productDetails = getProductDetails(item.produto_id);
+      const desc = formatProductDisplay(productDetails, item);
+      const key = `${desc.key}|${item.ambiente || ''}`;
+      if (!groupedProducts[key]) {
+        groupedProducts[key] = {
+          description: desc.key,
+          environment: item.ambiente || '-',
+          quantity: 1,
+          unitPrice: Number(item.valor_total || item.subtotal || 0),
+          totalPrice: Number(item.valor_total || item.subtotal || 0)
+        };
+      } else {
+        groupedProducts[key].quantity += 1;
+        groupedProducts[key].totalPrice += Number(item.valor_total || item.subtotal || 0);
+      }
     });
-    
-    const imgData = canvas.toDataURL('image/png');
-    
-    // Add the captured image to PDF
-    const pdfWidth = doc.internal.pageSize.getWidth();
-    const pdfHeight = doc.internal.pageSize.getHeight();
-    const imgWidth = canvas.width;
-    const imgHeight = canvas.height;
-    
-    // Calculate scaling to fit the page width while maintaining aspect ratio
-    const scale = pdfWidth / imgWidth;
-    const scaledHeight = imgHeight * scale;
-    
-    // Add multiple pages if content is too long
-    let heightLeft = scaledHeight;
-    let position = 0;
-    
-    // First page
-    doc.addImage(imgData, 'PNG', 0, position, pdfWidth, scaledHeight);
-    heightLeft -= pdfHeight;
-    
-    // Add new pages if needed
-    while (heightLeft >= 0) {
-      position = heightLeft - scaledHeight;
-      doc.addPage();
-      doc.addImage(imgData, 'PNG', 0, position, pdfWidth, scaledHeight);
-      heightLeft -= pdfHeight;
+
+    Object.values(groupedProducts).forEach(group => {
+      rows.push([
+        group.description,
+        group.environment,
+        String(group.quantity),
+        formatCurrency(group.unitPrice),
+        formatCurrency(group.totalPrice)
+      ]);
+    });
+
+    const acc = JSON.parse(budget.acessorios_json || '[]');
+    if (acc && acc.length > 0) {
+      const groupedAccessories = {};
+      acc.forEach(item => {
+        const accessoryName = getAccessoryName(item.accessory_id);
+        const key = `${item.accessory_id}_${item.color}`;
+        const unit = item.quantity && item.quantity > 0
+          ? (Number(item.valor_total || item.subtotal || 0) / item.quantity)
+          : Number(item.valor_total || item.subtotal || 0);
+        if (!groupedAccessories[key]) {
+          groupedAccessories[key] = {
+            description: accessoryName,
+            quantity: item.quantity || 1,
+            unitPrice: unit,
+            totalPrice: Number(item.valor_total || item.subtotal || 0)
+          };
+        } else {
+          groupedAccessories[key].quantity += (item.quantity || 1);
+          groupedAccessories[key].totalPrice += Number(item.valor_total || item.subtotal || 0);
+        }
+      });
+      Object.values(groupedAccessories).forEach(group => {
+        rows.push([
+          group.description,
+          '-',
+          String(group.quantity),
+          formatCurrency(group.unitPrice),
+          formatCurrency(group.totalPrice)
+        ]);
+      });
     }
-    
+    return rows;
+  };
+
+  const handleGeneratePDF = () => {
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = { top: 20, right: 10, bottom: 18, left: 10 };
+    const head = [['DESCRIÇÃO', 'AMBIENTE', 'QTD', 'VALOR UNIT.', 'VALOR TOTAL']];
+    const body = buildPdfRows();
+    const total = formatCurrency(Number(budget.valor_total || 0));
+    doc.setFontSize(12);
+    doc.text(`Orçamento #${budget.numero_orcamento || budget.id}`, margin.left, 12);
+    doc.setFontSize(9);
+    doc.text(`Data: ${new Date(budget.created_at).toLocaleDateString()}`, margin.left, 16);
+    autoTable(doc, {
+      head,
+      body,
+      startY: 22,
+      margin,
+      styles: { fontSize: 9, cellPadding: 1, lineWidth: 0.3 },
+      columnStyles: {
+        0: { cellWidth: 89 },
+        1: { cellWidth: 40 },
+        2: { cellWidth: 11, halign: 'center' },
+        3: { cellWidth: 18, halign: 'right' },
+        4: { cellWidth: 22, halign: 'right' },
+      },
+      showHead: 'everyPage',
+      showFoot: 'lastPage',
+      foot: [
+        [
+          { content: 'TOTAL:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } },
+          { content: total, styles: { halign: 'right', fontStyle: 'bold' } }
+        ]
+      ],
+      footStyles: { fillColor: [224, 224, 224], textColor: [0,0,0], fontStyle: 'bold' },
+      didDrawPage: (data) => {
+        doc.setFontSize(9);
+        const pageNumber = `${data.pageNumber}`;
+        doc.text(pageNumber, pageWidth - margin.right, doc.internal.pageSize.getHeight() - 10, { align: 'right' });
+      }
+    });
     doc.save(`orcamento_${budgetId}.pdf`);
+  };
+
+  const handlePrintNative = () => {
+    window.print();
   };
 
   const renderCustomerInfo = () => {
@@ -365,7 +432,7 @@ function BudgetDetailsPage({ companyLogo }) {
           &larr; Voltar para Lista de Orçamentos
         </button>
         <button 
-          onClick={handlePrintPDF}
+          onClick={handlePrintNative}
           className="print-button"
         >
           Imprimir / Salvar PDF
@@ -400,7 +467,7 @@ function BudgetDetailsPage({ companyLogo }) {
 
         <div className="budget-items">
           <h3>Itens do Orçamento</h3>
-          <table className="budget-table">
+          <table className="budget-table" id="budget-table">
             <colgroup>
               <col className="col-description" />
               <col className="col-environment" />
@@ -496,7 +563,7 @@ function BudgetDetailsPage({ companyLogo }) {
       </div>
 
       <div className="action-buttons">
-        <button className="action-button print-button" onClick={handlePrintPDF}>
+        <button className="action-button print-button" onClick={handleGeneratePDF}>
           Gerar PDF
         </button>
       </div>

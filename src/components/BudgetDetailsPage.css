@@ -143,9 +143,10 @@
 
 /* --- NOVAS LARGURAS DAS COLUNAS (Soma = 100%) --- */
 
-/* 1. Descrição: 52% (mais espaço para texto) */
-.budget-table .col-description { width: 52%; }
+/* 1. Descrição: 48% (reduz para ampliar valor total) */
+.budget-table .col-description { width: 48%; }
 .budget-table .description { 
+  font-size: 8px;
   text-align: left;
   overflow-wrap: break-word;
   word-wrap: break-word;
@@ -178,8 +179,8 @@
   vertical-align: middle;
 }
 
-/* 5. Valor Total: 10% */
-.budget-table .col-total { width: 10%; }
+/* 5. Valor Total: auto para preencher o restante */
+.budget-table .col-total { width: auto; }
 .budget-table .total { 
   text-align: right;
   white-space: nowrap;
@@ -236,7 +237,7 @@
 }
 .back-button { background: #ccc; }
 .print-button { background: #000; color: #fff; }
-.action-buttons { display: none; }
+.action-buttons { width: 210mm; display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
 
 /* --- IMPRESSÃO --- */
 @media print {
@@ -257,6 +258,7 @@
     min-height: auto;
   }
   .action-buttons-container { display: none !important; }
+  .action-buttons { display: none !important; }
 
   /* Evitar qualquer corte de números na impressão */
   .budget-table td.unit-price,
@@ -277,14 +279,14 @@
   }
 
   /* Larguras exatas para área útil A4 (180mm) */
-  .budget-table col.col-description { width: 94mm !important; }
+  .budget-table col.col-description { width: 89mm !important; }
   .budget-table col.col-environment { width: 40mm !important; }
   .budget-table col.col-quantity { width: 11mm !important; }
   .budget-table col.col-unit-price { width: 18mm !important; }
-  .budget-table col.col-total { width: 17mm !important; }
+  .budget-table col.col-total { width: 22mm !important; }
 
   .budget-table { page-break-inside: auto; }
   .budget-table thead { display: table-header-group; }
-  .budget-table tfoot { display: table-footer-group; }
+  .budget-table tfoot { display: table-row-group; }
   .budget-table tr { page-break-inside: avoid; break-inside: avoid-page; }
 }
