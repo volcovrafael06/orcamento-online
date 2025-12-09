@@ -485,10 +485,13 @@ function BudgetDetailsPage({ companyLogo }) {
                 ));
               })()}
             </tbody>
+            <tfoot>
+              <tr>
+                <td className="description total-label" colSpan="4">TOTAL:</td>
+                <td className="total">{formatCurrency(Number(budget.valor_total || 0))}</td>
+              </tr>
+            </tfoot>
           </table>
-          <div className="budget-total">
-            Total: {formatCurrency(Number(budget.valor_total || 0))}
-          </div>
         </div>
       </div>
 
