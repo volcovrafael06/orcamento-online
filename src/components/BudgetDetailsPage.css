@@ -144,7 +144,7 @@
 /* --- NOVAS LARGURAS DAS COLUNAS (Soma = 100%) --- */
 
 /* 1. Descrição: 48% (reduz para ampliar valor total) */
-.budget-table .col-description { width: 48%; }
+.budget-table .col-description { width: 46%; }
 .budget-table .description { 
   font-size: 8px;
   text-align: left;
@@ -166,7 +166,7 @@
 }
 
 /* 3. Qtd: 6% */
-.budget-table .col-quantity { width: 6%; }
+.budget-table .col-quantity { width: 5%; }
 .budget-table .quantity { 
   text-align: center; 
 }
@@ -186,6 +186,17 @@
   white-space: nowrap;
   vertical-align: middle;
 }
+
+/* Garantir que o cabeçalho e as células de VALOR TOTAL tenham exatamente a mesma largura */
+.budget-table th.total,
+.budget-table td.total { width: 30mm !important; }
+
+/* Colgroup widths for precise alignment (preview) */
+.budget-table col.col-description { width: 83mm; }
+.budget-table col.col-environment { width: 40mm; }
+.budget-table col.col-quantity { width: 9mm; }
+.budget-table col.col-unit-price { width: 18mm; }
+.budget-table col.col-total { width: 30mm; }
 
 /* Padding reduzido nas colunas de valor para ganhar espaço e alinhar */
 .budget-table td.unit-price,
@@ -279,11 +290,11 @@
   }
 
   /* Larguras exatas para área útil A4 (180mm) */
-  .budget-table col.col-description { width: 89mm !important; }
+  .budget-table col.col-description { width: 83mm !important; }
   .budget-table col.col-environment { width: 40mm !important; }
-  .budget-table col.col-quantity { width: 11mm !important; }
+  .budget-table col.col-quantity { width: 9mm !important; }
   .budget-table col.col-unit-price { width: 18mm !important; }
-  .budget-table col.col-total { width: 22mm !important; }
+  .budget-table col.col-total { width: 30mm !important; }
 
   .budget-table { page-break-inside: auto; }
   .budget-table thead { display: table-header-group; }
