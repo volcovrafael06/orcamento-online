@@ -322,6 +322,7 @@ function BudgetDetailsPage({ companyLogo }) {
   const handleGeneratePDF = async () => {
     const element = contentRef.current;
     if (!element) return;
+    const table = element.querySelector('.budget-table');
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
     const pdfWidth = doc.internal.pageSize.getWidth();
     const pdfHeight = doc.internal.pageSize.getHeight();
@@ -330,12 +331,28 @@ function BudgetDetailsPage({ companyLogo }) {
     const imgWidthPx = canvas.width;
     const imgHeightPx = canvas.height;
     const scale = pdfWidth / imgWidthPx;
-    const scaledHeight = imgHeightPx * scale;
-    let pages = Math.ceil(scaledHeight / pdfHeight);
-    for (let p = 0; p < pages; p++) {
-      const position = -p * pdfHeight;
-      if (p > 0) doc.addPage();
-      doc.addImage(imgData, 'PNG', 0, position, pdfWidth, scaledHeight);
+    const pageHeightPx = pdfHeight / scale;
+
+    let breaks = [];
+    if (table) {
+      const elementTop = element.getBoundingClientRect().top;
+      const rows = Array.from(table.querySelectorAll('tbody tr'));
+      breaks = rows.map(r => r.getBoundingClientRect().bottom - elementTop);
+      // Ensure last break includes entire element height
+      if (breaks[breaks.length - 1] < imgHeightPx) breaks.push(imgHeightPx);
+    } else {
+      breaks = [imgHeightPx];
+    }
+
+    let startPx = 0;
+    while (startPx < imgHeightPx - 1) {
+      // Find the largest break <= startPx + pageHeightPx
+      const target = startPx + pageHeightPx;
+      const nextBreak = breaks.reduce((acc, b) => (b <= target ? b : acc), startPx + pageHeightPx);
+      const y = -startPx * scale;
+      if (startPx > 0) doc.addPage();
+      doc.addImage(imgData, 'PNG', 0, y, pdfWidth, imgHeightPx * scale);
+      startPx = nextBreak;
     }
     doc.save(`orcamento_${budgetId}.pdf`);
   };

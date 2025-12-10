@@ -143,8 +143,8 @@
 
 /* --- NOVAS LARGURAS DAS COLUNAS (Soma = 100%) --- */
 
-/* 1. Descrição: 48% (reduz para ampliar valor total) */
-.budget-table .col-description { width: 46%; }
+/* 1. Descrição: largura pelo colgroup */
+.budget-table .col-description { width: auto; }
 .budget-table .description { 
   font-size: 8px;
   text-align: left;
@@ -154,8 +154,8 @@
   vertical-align: top;
 }
 
-/* 2. Ambiente: 22% */
-.budget-table .col-environment { width: 22%; }
+/* 2. Ambiente: largura pelo colgroup */
+.budget-table .col-environment { width: auto; }
 .budget-table .environment { 
   text-align: center;
   overflow-wrap: anywhere;
@@ -165,26 +165,38 @@
   vertical-align: top;
 }
 
-/* 3. Qtd: 6% */
-.budget-table .col-quantity { width: 5%; }
+/* 3. Qtd: largura pelo colgroup */
+.budget-table .col-quantity { width: auto; }
 .budget-table .quantity { 
   text-align: center; 
 }
 
-/* 4. Valor Unit.: 10% */
-.budget-table .col-unit-price { width: 10%; }
+/* 4. Valor Unit.: largura pelo colgroup */
+.budget-table .col-unit-price { width: auto; }
 .budget-table .unit-price { 
   text-align: right;
   white-space: nowrap;
   vertical-align: middle;
 }
 
-/* 5. Valor Total: auto para preencher o restante */
+/* 5. Valor Total: largura pelo colgroup */
 .budget-table .col-total { width: auto; }
 .budget-table .total { 
   text-align: right;
   white-space: nowrap;
   vertical-align: middle;
+}
+
+/* Corrigir visual da altura da borda direita quando a linha é alta */
+.budget-table td.total { position: relative; }
+.budget-table td.total::after {
+  content: '';
+  position: absolute;
+  right: -1px;
+  top: -1px;
+  bottom: -1px;
+  width: 1px;
+  background: #000;
 }
 
 /* Garantir que o cabeçalho e as células de VALOR TOTAL tenham exatamente a mesma largura */
